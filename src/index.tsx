@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import App from "./App";
 import { RouterProvider } from "react-router-dom";
-import router from "./Router";
+import router from "./router/Router";
 import { RecoilRoot } from "recoil";
 import { darkTheme } from "./theme";
 import reset from "styled-reset";

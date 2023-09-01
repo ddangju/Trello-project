@@ -1,9 +1,9 @@
-import ToDoList from "./components/ToDoList";
+import DragDropPage from "./pages/DragDropPage";
 
 function App() {
   return (
     <>
-      <ToDoList></ToDoList>
+      <DragDropPage />
     </>
   );
 }
