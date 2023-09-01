@@ -25,41 +25,33 @@ function DragDropPage() {
     const { destination, draggableId, source } = result;
     if (destination?.droppableId === source.droppableId) {
       setToDos((arg) => {
+        console.log(arg, '<arg');
         const boardCopy = [...arg[source.droppableId]];
         boardCopy.splice(source.index, 1);
         boardCopy.splice(destination.index, 0, draggableId);
         return { ...arg, [source.droppableId]: boardCopy };
       });
-      // setToDos((args) => {
-      //   const toDoscopy = [...args[source.droppableId]];
-      //   toDoscopy.splice(source.index, 1);
-      //   toDoscopy.splice(destination.index, 0, draggableId);
-      //   return toDoscopy;
-      // });
     }
     //1.source 보드와 destination보드가 같은지 체크해야함.
-
-    // console.log(source);
-    // console.log(draggableId);
-    // console.log(destination);
-    // setToDos((args): any => {
-    //   if (!destination) return;
-    //   const toDosCopy = { ...args };
-    //   // const test = toDosCopy[source.droppableId].splice(source.index, 1);
-    //   console.log(toDosCopy[source.droppableId], '<Test');
-    //   // toDosCopy[source.droppableId].splice(destination.index, 0, draggableId);
-    //   // return toDosCopy;
-    // });
-    //set으로 atom을 수정하는 방법은 두가지
-    //1. 그냥 값을 보내는 방법
-    //2. 인자로 보낸 다음 원하는 값으로 return받는 방법
-    ///destination이 없을때 => 사용자가 카드를 이동시키지 않을때
-    // setToDos((arg) => {
-    //   const toDosCopy = [...arg];
-    //   toDosCopy.splice(source.index, 1);
-    //   toDosCopy.splice(destination.index, 0, draggableId);
-    //   return toDosCopy;
-    // });
+    if (destination && destination?.droppableId !== source.droppableId) {
+      setToDos((arg) => {
+        //현재 위치 복사
+        const sourceBoard = [...arg[source.droppableId]];
+        sourceBoard.splice(source.index, 1);
+        //옮길 위치 복사
+        const targetBoard = [...arg[destination?.droppableId]];
+        targetBoard.splice(destination.index, 0, draggableId);
+        // con
+        return {
+          ...arg,
+          [source.droppableId]: sourceBoard,
+          [destination?.droppableId]: targetBoard,
+        };
+      });
+      ///1.현재 위치 인덱스 삭제
+      ///2.destinamtion 위치가 변경
+      ///3. destination
+    }
   };
   return (
     <>
