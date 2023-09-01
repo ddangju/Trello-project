@@ -2,7 +2,8 @@ import styled from 'styled-components';
 import { Droppable } from 'react-beautiful-dnd';
 import DraggableCard from '../components/DraggableCard';
 import { useForm } from 'react-hook-form';
-import { ITodo } from '../store/atoms';
+import { ITodo, toDoState } from '../store/atoms';
+import { useSetRecoilState } from 'recoil';
 interface IAreaProps {
   isDraggingFromThis: boolean;
   isDraggingOver: boolean;
@@ -48,8 +49,21 @@ interface IForm {
   toDo: string;
 }
 function BoardsComponents(props: IBoardProps) {
+  const setToDos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const onValid = ({ toDo }: IForm) => {
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    ///todo를 입력할때 해당하는 boardid가 필요하기때문에 지정해주어야함
+
+    setToDos((allBoards) => {
+      return {
+        ...allBoards,
+        [props.boardId]: [newToDo, ...allBoards[props.boardId]],
+      };
+    });
     setValue('toDo', '');
     // setValue('toDo', '');
   };
