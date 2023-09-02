@@ -1,5 +1,5 @@
-ToDoList using recoil
+# ✨let try using Trello
 
-- React Hook Form
-- Typescript
+- React
+- react-beautiful-dnd
 - Recoil
