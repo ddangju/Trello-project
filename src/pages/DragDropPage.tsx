@@ -1,127 +1,82 @@
 import {
   DragDropContext,
-  Draggable,
   DropResult,
-  Droppable,
   OnDragEndResponder,
-} from "react-beautiful-dnd";
-import { useRecoilState } from "recoil";
-import styled from "styled-components";
-import { toDoState } from "../store/atoms";
+} from 'react-beautiful-dnd';
+import { useRecoilState } from 'recoil';
+import styled from 'styled-components';
+import { toDoState } from '../store/atoms';
+import BoardsComponents from '../components/Board';
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 480px;
-  width: 100%;
+  width: 100vw;
   margin: 0 auto;
   justify-content: center;
   align-items: center;
+  gap: 10px;
   height: 100vh;
 `;
 
-const Boards = styled.div`
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(1, 1fr);
-`;
-
-const Board = styled.div`
-  padding: 20px 10px;
-  padding-top: 30px;
-  background-color: ${(props) => props.theme.boardColor};
-  border-radius: 5px;
-  min-height: 200px;
-`;
-
-const Card = styled.div`
-  border-radius: 5px;
-  margin-bottom: 5px;
-  padding: 10px 10px;
-  background-color: ${(props) => props.theme.cardColor};
-`;
 function DragDropPage() {
   const [toDos, setToDos] = useRecoilState(toDoState);
 
-  const onDragEnd: OnDragEndResponder = ({
-    destination,
-    source,
-  }: DropResult) => {
-    //set으로 atom을 수정하는 방법은 두가지
-    //1. 그냥 값을 보내는 방법
-    //2. 인자로 보낸 다음 원하는 값으로 return받는 방법
-    console.log(source.index);
-    setToDos((arg) => {
-      const copyToDos = [...arg];
-      const test = copyToDos.splice(source.index, 1);
-      console.log(test, "<testg");
-      return [];
-    });
+  const onDragEnd: OnDragEndResponder = (result: DropResult) => {
+    const { destination, draggableId, source } = result;
+    if (destination?.droppableId === source.droppableId) {
+      setToDos((arg) => {
+        console.log(arg, '<arg');
+        const boardCopy = [...arg[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination.index, 0, draggableId);
+        return { ...arg, [source.droppableId]: boardCopy };
+      });
+    }
+    //1.source 보드와 destination보드가 같은지 체크해야함.
+    if (destination && destination?.droppableId !== source.droppableId) {
+      setToDos((arg) => {
+        //현재 위치 복사
+        const sourceBoard = [...arg[source.droppableId]];
+        sourceBoard.splice(source.index, 1);
+        //옮길 위치 복사
+        const targetBoard = [...arg[destination?.droppableId]];
+        targetBoard.splice(destination.index, 0, draggableId);
+        // con
+        return {
+          ...arg,
+          [source.droppableId]: sourceBoard,
+          [destination?.droppableId]: targetBoard,
+        };
+      });
+      ///1.현재 위치 인덱스 삭제
+      ///2.destinamtion 위치가 변경
+      ///3. destination
+    }
   };
-
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
-          <Boards>
-            <Droppable droppableId="one">
-              {(magic) => (
-                <Board ref={magic.innerRef} {...magic.droppableProps}>
-                  {toDos.map((toDo, index) => (
-                    <Draggable key={index} draggableId={toDo} index={index}>
-                      {(magic) => (
-                        <Card
-                          ref={magic.innerRef}
-                          {...magic.dragHandleProps}
-                          {...magic.draggableProps}
-                        >
-                          {toDo}
-                        </Card>
-                      )}
-                    </Draggable>
-                  ))}
-                  {magic.placeholder}
-                </Board>
-              )}
-            </Droppable>
-          </Boards>
+          {toDos &&
+            Object.keys(toDos).map((boardId) => (
+              <BoardsComponents
+                boardId={boardId}
+                key={boardId}
+                toDos={toDos[boardId]}
+              />
+            ))}
         </Wrapper>
       </DragDropContext>
-      {/* <DragDropContext onDragEnd={onDragEnd}>
-        <div>
-          <Droppable droppableId="one">
-            {(provider) => {
-              return (
-                <ul ref={provider.innerRef} {...provider.droppableProps}>
-                  <Draggable draggableId="first" index={0}>
-                    {(provider) => (
-                      <li
-                        ref={provider.innerRef}
-                        {...provider.dragHandleProps}
-                        {...provider.draggableProps}
-                      >
-                        1
-                      </li>
-                    )}
-                  </Draggable>
-                  <Draggable draggableId="second" index={1}>
-                    {(provider) => (
-                      <li
-                        ref={provider.innerRef}
-                        {...provider.dragHandleProps}
-                        // {...provider.draggableProps}
-                      >
-                        2
-                      </li>
-                    )}
-                  </Draggable>
-                </ul>
-              );
-            }}
-          </Droppable>
-        </div>
-      </DragDropContext> */}
     </>
   );
 }
 
 export default DragDropPage;
+
+///놓친 부분
+//객체 내부의 프로퍼티의 배열의 값이 변경된다면
+//그 부분만 복사를 하면된다
+//하지만 나는? 객체 전체를 복사를 시도했다...=> 이러한 이유로 splice가 되지 않았떤 것이 아닐까..?
+//2. 복사를 한 프로퍼티 값만 returnㅎㅏ려고함..
+/////다른 객체의 프로퍼티들은 바뀌질 않았으니 그 부분과 같이 합쳐서 return해줘야했다. => 어떻게 합치지?
+/////이 부분은 꼭 명심하기!!!
