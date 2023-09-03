@@ -20,27 +20,27 @@ const Wrapper = styled.div`
 
 function DragDropPage() {
   const [toDos, setToDos] = useRecoilState(toDoState);
-
+  ///1. droppableId는 해당 카드의 id
+  // 2. toDos
   const onDragEnd: OnDragEndResponder = (result: DropResult) => {
-    const { destination, draggableId, source } = result;
+    const { destination, source } = result;
     if (destination?.droppableId === source.droppableId) {
-      setToDos((arg) => {
-        console.log(arg, '<arg');
-        const boardCopy = [...arg[source.droppableId]];
+      setToDos((args): any => {
+        const boardCopy = [...args[source.droppableId]];
         boardCopy.splice(source.index, 1);
-        boardCopy.splice(destination.index, 0, draggableId);
-        return { ...arg, [source.droppableId]: boardCopy };
+        const taskObj = boardCopy[source.index];
+        boardCopy.splice(destination?.index, 0, taskObj);
       });
     }
-    //1.source 보드와 destination보드가 같은지 체크해야함.
     if (destination && destination?.droppableId !== source.droppableId) {
       setToDos((arg) => {
         //현재 위치 복사
         const sourceBoard = [...arg[source.droppableId]];
         sourceBoard.splice(source.index, 1);
         //옮길 위치 복사
+        const taskObj = sourceBoard[source.index];
         const targetBoard = [...arg[destination?.droppableId]];
-        targetBoard.splice(destination.index, 0, draggableId);
+        targetBoard.splice(destination.index, 0, taskObj);
         // con
         return {
           ...arg,
@@ -48,9 +48,6 @@ function DragDropPage() {
           [destination?.droppableId]: targetBoard,
         };
       });
-      ///1.현재 위치 인덱스 삭제
-      ///2.destinamtion 위치가 변경
-      ///3. destination
     }
   };
   return (
@@ -58,13 +55,15 @@ function DragDropPage() {
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
           {toDos &&
-            Object.keys(toDos).map((boardId) => (
-              <BoardsComponents
-                boardId={boardId}
-                key={boardId}
-                toDos={toDos[boardId]}
-              />
-            ))}
+            Object.keys(toDos).map((boardId): any => {
+              return (
+                <BoardsComponents
+                  boardId={boardId}
+                  key={boardId}
+                  toDos={toDos[boardId]}
+                />
+              );
+            })}
         </Wrapper>
       </DragDropContext>
     </>
@@ -80,3 +79,21 @@ export default DragDropPage;
 //2. 복사를 한 프로퍼티 값만 returnㅎㅏ려고함..
 /////다른 객체의 프로퍼티들은 바뀌질 않았으니 그 부분과 같이 합쳐서 return해줘야했다. => 어떻게 합치지?
 /////이 부분은 꼭 명심하기!!!
+
+////객체로 변경하고 난 후
+/// object로 이루어져있는데 string을 넣으려고 했기 때문에 계속 컴파일 에러가 남
+// if (destination?.droppableId === source.droppableId) {
+//   setToDos((arg) => {
+//     const boardCopy = [...arg[source.droppableId]];
+//     boardCopy.splice(source.index, 1);
+//     boardCopy.splice(destination.index, 0, { text: '', id: 1 });
+//     return { ...arg, [source.droppableId]: boardCopy };
+//   });
+// }
+
+///궁금한 부분
+///  const onDragEnd: OnDragEndResponder = (result: DropResult) => {
+// toDos[result.source.droppableId].console.log();
+//   toDos[result.source.droppableId].findIndex((obj) => obj.id === result?.droppableId);
+// };
+//해당 코드를 작성하면 droppableId type이 존재하지 않다고 나온다 하지만 타입을 ㅏ타고 들어가면 존재함..뭐 어쩌라는거..
