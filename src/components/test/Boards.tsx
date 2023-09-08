@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import { Droppable } from 'react-beautiful-dnd';
-import DraggableCard from '../components/DraggableCard';
+import { Draggable, Droppable, DroppableProvided } from 'react-beautiful-dnd';
+import DraggableCard from '../DraggableCard';
 import { useForm } from 'react-hook-form';
-import { ITodo, toDoState } from '../store/atoms';
+import { ITodo, toDoState } from '../../store/atoms';
 import { useSetRecoilState } from 'recoil';
 interface IAreaProps {
   isDraggingFromThis: boolean;
@@ -47,60 +47,34 @@ const Form = styled.form`
 `;
 interface IForm {
   toDo: string;
+  boardId: number;
+  ref:(element: HTMLElement | null) => void;
 }
-function BoardsComponents(props: IBoardProps) {
+function TrelloBoards(props:IForm) {
   const setToDos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const onValid = ({ toDo }: IForm) => {
-    const newToDo = {
-      id: Date.now(),
-      text: toDo,
-    };
-    ///todo를 입력할때 해당하는 boardid가 필요하기때문에 지정해주어야함
-
-    setToDos((allBoards) => {
-      return {
-        ...allBoards,
-        [props.boardId]: [newToDo, ...allBoards[props.boardId]],
-      };
-    });
-    setValue('toDo', '');
-    // setValue('toDo', '');
   };
   return (
     <>
-      <Boards>
-        <Title>{props.boardId}</Title>
-        <Form onSubmit={handleSubmit(onValid)}>
-          <input
-            {...register('toDo', { required: true })}
-            type="text"
-            placeholder={`Add task on ${props.boardId}`}
-          />
-        </Form>
-        <Droppable droppableId={props.boardId}>
-          {(magic, snapShot) => (
-            <Area
-              ref={magic.innerRef}
-              {...magic.droppableProps}
-            >
-              {props.toDos.map((toDo, index) => (
-                <DraggableCard
-                  key={toDo.id}
-                  index={index}
-                  toDoId={toDo.id}
-                  toDoText={toDo.text}
-                />
-              ))}
-              {magic.placeholder}
-            </Area>
-          )}
-        </Droppable>
-      </Boards>
+    <Draggable draggableId="1" index={props.boardId}>
+      {(provied)=>(
+        <Boards ref={provied.innerRef} {...provied.dragHandleProps} {...provied.dragHandleProps}>
+          <Title>title</Title>
+          <Form onSubmit={handleSubmit(onValid)}>
+            <input
+              {...register('toDo', { required: true })}
+              type="text"
+            />
+          </Form>
+        </Boards>
+      )}
+
+      </Draggable>
     </>
   );
 }
-export default BoardsComponents;
+export default TrelloBoards;
 ///isDraggingOver : board위로 드래그해서 들어고고 있는지 확인
 ///draggingFromThisWith : 현재 droppable에서 벗어낫는지
 ///isDragging

@@ -15,3 +15,11 @@ export const toDoState = atom<IToDoState>({
     done: [],
   },
 });
+export const boardState = atom({
+  key:"boards",
+  default:[
+    {id:1,text:"board1"},
+    {id:2,text:"board2"},
+    {id:3,text:"board3"}
+  ]
+});
