@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { Draggable, Droppable, DroppableProvided } from 'react-beautiful-dnd';
-import DraggableCard from '../DraggableCard';
 import { useForm } from 'react-hook-form';
 import { ITodo, toDoState } from '../../store/atoms';
 import { useSetRecoilState } from 'recoil';
+import { forwardRef } from 'react';
 interface IAreaProps {
   isDraggingFromThis: boolean;
   isDraggingOver: boolean;
@@ -22,16 +22,14 @@ const Boards = styled.div`
 `;
 
 const Area = styled.div`
-  width: 300px;
-  padding: 20px 10px;
-  padding-top: 10px;
+  width: 150px;
   background-color: ${(props) => props.theme.boardColor};
+  background-color: #e1cdff;
   border-radius: 5px;
-  overflow: hidden;
-  min-height: 300px;
-  flex-grow: 1;
+  /* overflow: hidden; */
+  min-height: 150px;
+  /* flex-grow: 1; */
   transition: background-color 0.3s ease-in-out;
-  padding: 20px;
 `;
 const Title = styled.h2`
   text-align: center;
@@ -45,31 +43,26 @@ const Form = styled.form`
     width: 100%;
   }
 `;
+
 interface IForm {
-  toDo: string;
-  boardId: number;
-  ref:(element: HTMLElement | null) => void;
+  index: string;
+  boardId: string;
 }
-function TrelloBoards(props:IForm) {
-  const setToDos = useSetRecoilState(toDoState);
-  const { register, setValue, handleSubmit } = useForm<IForm>();
-  const onValid = ({ toDo }: IForm) => {
-  };
+
+function TrelloBoards(props: IForm) {
+  const index = parseInt(props.index);
   return (
     <>
-    <Draggable draggableId="1" index={props.boardId}>
-      {(provied)=>(
-        <Boards ref={provied.innerRef} {...provied.dragHandleProps} {...provied.dragHandleProps}>
-          <Title>title</Title>
-          <Form onSubmit={handleSubmit(onValid)}>
-            <input
-              {...register('toDo', { required: true })}
-              type="text"
-            />
-          </Form>
-        </Boards>
-      )}
-
+      <Draggable draggableId={props.index.toString()} index={index}>
+        {(provied) => (
+          <Area
+            ref={provied.innerRef}
+            {...provied.draggableProps}
+            {...provied.dragHandleProps}
+          >
+            <Title style={{ fontSize: `${index * 10}px` }}>title</Title>
+          </Area>
+        )}
       </Draggable>
     </>
   );

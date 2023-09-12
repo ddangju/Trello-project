@@ -1,5 +1,5 @@
 import MainPage from "./components/test/Main";
-import DragDropPage from "./pages/DragDropPage";
+// import DragDropPage from "./pages/DragDropPage";
 
 function App() {
   return (
