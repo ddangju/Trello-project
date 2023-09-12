@@ -4,11 +4,11 @@ import {
   DroppableProvided,
   DropResult,
   OnDragEndResponder,
-} from 'react-beautiful-dnd';
-import { useRecoilState } from 'recoil';
-import styled from 'styled-components';
-import { boardState, toDoState } from '../../store/atoms';
-import TrelloBoards from './Boards';
+} from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
+import styled from "styled-components";
+import { boardState, toDoState } from "../../store/atoms";
+import TrelloBoards from "./Boards";
 
 const Wrapper = styled.div`
   width: 100vw;
@@ -19,25 +19,28 @@ const Wrapper = styled.div`
 `;
 const Boards = styled.div`
   display: flex;
+  height: 300px;
   gap: 20px;
+  background-color: red;
 `;
 
 function MainPage() {
   const [boardList, setBoardList] = useRecoilState(boardState);
   const onDragEnd: OnDragEndResponder = (result: DropResult) => {
-    console.log(result, '<result');
+    console.log(result, "<result");
     const { destination, source } = result;
     if (destination?.droppableId === source.droppableId) {
       setBoardList((args): any => {
         //1.전체 배열 복사
         const boardCopy = [...args];
         //2. 선택한 요소 복사
-        const taskObj = boardCopy[source.index - 1];
-        console.log(taskObj, '<taskObj');
+        const taskObj = boardCopy[source.index];
         //3.전체 배열에서 source.index삭제하기
-        boardCopy.splice(source.index - 1, 1);
+        boardCopy.splice(source.index, 1);
         //4. 전체 배열에서 삭제한 인덱스 옮기려는 Index
-        boardCopy.splice(destination.index - 1, 0, taskObj);
+
+        boardCopy.splice(destination.index, 0, taskObj);
+
         return boardCopy;
       });
     }
@@ -54,7 +57,8 @@ function MainPage() {
                     <TrelloBoards
                       boardId={item.boardId}
                       key={item.boardId}
-                      index={item.id.toString()}
+                      toDos={item.toDos}
+                      index={idx}
                     />
                   );
                 })}
