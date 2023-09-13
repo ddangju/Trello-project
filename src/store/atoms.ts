@@ -1,4 +1,4 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 
 export interface ITodo {
   text: string;
@@ -7,7 +7,7 @@ interface IToDoState {
   [key: string]: ITodo[];
 }
 export const toDoState = atom<IToDoState>({
-  key: "toDo",
+  key: 'toDo',
   default: {
     to_do: [],
     doing: [],
@@ -15,10 +15,10 @@ export const toDoState = atom<IToDoState>({
   },
 });
 export const boardState = atom({
-  key: "boards",
+  key: 'boards',
   default: [
-    { boardId: "toDo", toDos: ["밥먹기", "잠먹기"] },
-    { boardId: "progress", toDos: ["똥싸기", "쉬싸기"] },
-    { boardId: "done", toDos: ["출근하기", "퇴근하기"] },
+    { boardId: 'toDo', toDos: ['eat', 'sleep'] },
+    { boardId: 'progress', toDos: ['work', 'running'] },
+    { boardId: 'done', toDos: ['exercise', 'home'] },
   ],
 });
