@@ -27,8 +27,8 @@
 //     if (destination?.droppableId === source.droppableId) {
 //       setToDos((args): any => {
 //         const boardCopy = [...args[source.droppableId]];
-//         boardCopy.splice(source.index, 1);
 //         const taskObj = boardCopy[source.index];
+//         boardCopy.splice(source.index, 1);
 //         boardCopy.splice(destination?.index, 0, taskObj);
 //       });
 //     }

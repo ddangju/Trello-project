@@ -4,11 +4,11 @@ import {
   DroppableProvided,
   DropResult,
   OnDragEndResponder,
-} from 'react-beautiful-dnd';
-import { useRecoilState } from 'recoil';
-import styled from 'styled-components';
-import { boardState, toDoState } from '../../store/atoms';
-import TrelloBoards from './Boards';
+} from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
+import styled from "styled-components";
+import { boardState, toDoState } from "../../store/atoms";
+import TrelloBoards from "./Boards";
 const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
@@ -25,8 +25,8 @@ function MainPage() {
   const [boardList, setBoardList] = useRecoilState(boardState);
   const onDragEnd: OnDragEndResponder = (result: DropResult) => {
     const { destination, source, type } = result;
-    if (destination && type === 'boards') {
-      setBoardList((args): any => {
+    if (destination && type === "boards") {
+      setBoardList((args) => {
         //1.전체 배열 복사
         const boardCopy = [...args];
         //2. 선택한 요소 복사
@@ -37,32 +37,6 @@ function MainPage() {
         boardCopy.splice(destination.index, 0, taskObj);
         return boardCopy;
       });
-    }
-    if (destination && type === 'task') {
-      if (destination.droppableId === source.droppableId) {
-        setBoardList((args): any => {
-          //전체 객체 복사를 해야하는 것인지 확인
-          const boardCopy = [...args];
-          //1.target board 찾기
-          const targetBoard = args.findIndex(
-            (item) => item.boardId === destination.droppableId
-          );
-          console.log(targetBoard, '<');
-          //2.target board 복사하기
-          // const targetBoardCopy = [...(targetBoard?.toDos as any)];
-          // //3. result.source 복사
-          // const taskObj = targetBoardCopy[source.index];
-          // //4. 복사한 배열에서 삭제
-          // targetBoardCopy.splice(source.index, 1);
-          // //5. 값 이동시키기
-          // targetBoardCopy.splice(destination.index, 0, taskObj as string);
-          // console.log(targetBoardCopy);
-          // console.log(boardCopy);
-          // console.log({ ...targetBoard, toDos: targetBoardCopy });
-          // return [...boardCopy, { ...targetBoard, toDos: targetBoardCopy }];
-          return args;
-        });
-      }
     }
   };
   return (

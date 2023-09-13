@@ -1,10 +1,17 @@
-import styled from 'styled-components';
-import { Draggable, Droppable, DroppableProvided } from 'react-beautiful-dnd';
-import { useForm } from 'react-hook-form';
-import { ITodo, boardState, toDoState } from '../../store/atoms';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { forwardRef } from 'react';
-import Task from './Task';
+import styled from "styled-components";
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+  DroppableProvided,
+  OnDragEndResponder,
+} from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
+import { ITodo, boardState, toDoState } from "../../store/atoms";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { forwardRef } from "react";
+import Task from "./Task";
 
 const TaskList = styled.div`
   background-color: #68faca;
@@ -33,6 +40,35 @@ interface IBoard {
 }
 
 function TrelloBoards(props: IBoard) {
+  const [boardList, setBoardList] = useRecoilState(boardState);
+
+  const onDragEnd: OnDragEndResponder = (result) => {
+    const { destination, source, type } = result;
+    if (destination && type === "task") {
+      if (destination.droppableId === source.droppableId) {
+        setBoardList((prev) => {
+          //1.특정 index찾기
+          const targetBoardIndex = prev.findIndex(
+            (item) => item.boardId === destination.droppableId
+          );
+          ///2. 전체 state복사
+          const boardCopy = [...prev];
+          ///3. 특정 index의 값 가져오기
+          const targetBoard = boardCopy[targetBoardIndex];
+          //4. 특정 index의 값의 toDos copy하기
+          const newToDos = [...targetBoard.toDos];
+          const [targetToDo] = newToDos.splice(source.index, 1);
+          newToDos.splice(destination.index, 0, targetToDo);
+          boardCopy[targetBoardIndex] = {
+            ...targetBoard,
+            toDos: newToDos,
+          };
+          return boardCopy;
+        });
+      }
+    }
+  };
+
   return (
     <>
       <Draggable draggableId={props.boardId} index={props.index}>
@@ -43,20 +79,25 @@ function TrelloBoards(props: IBoard) {
             {...provied.dragHandleProps}
           >
             <Title>{props.boardId}</Title>
-            <Droppable
-              direction="vertical"
-              droppableId={props.boardId}
-              type="task"
-            >
-              {(provided: DroppableProvided) => (
-                <TaskList ref={provided.innerRef} {...provided.droppableProps}>
-                  {props.toDos.map((item, idx): any => (
-                    <Task item={item} index={idx} key={idx} />
-                  ))}
-                  {provided.placeholder}
-                </TaskList>
-              )}
-            </Droppable>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                direction="vertical"
+                droppableId={props.boardId}
+                type="task"
+              >
+                {(provided: DroppableProvided) => (
+                  <TaskList
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    {props.toDos.map((item, idx) => (
+                      <Task item={item} index={idx} key={item} />
+                    ))}
+                    {provided.placeholder}
+                  </TaskList>
+                )}
+              </Droppable>
+            </DragDropContext>
           </Area>
         )}
       </Draggable>
@@ -64,3 +105,6 @@ function TrelloBoards(props: IBoard) {
   );
 }
 export default TrelloBoards;
+
+///react의 key
+//
