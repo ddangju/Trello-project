@@ -7,7 +7,7 @@ import {
   DroppableProvided,
   OnDragEndResponder,
 } from 'react-beautiful-dnd';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { ITodo, boardState, toDoState } from '../../store/atoms';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { forwardRef } from 'react';
@@ -32,45 +32,34 @@ const Title = styled.h2`
   margin-bottom: 10px;
   font-size: 18px;
 `;
-
+const Form = styled.form``;
 interface IBoard {
   index: number;
   boardId: string;
   toDos: string[];
   onDragEnd: OnDragEndResponder;
 }
-
+interface IForm {
+  toDo: string;
+}
 function TrelloBoards(props: IBoard) {
   const [boardList, setBoardList] = useRecoilState(boardState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
 
-  // const onDragEnd: OnDragEndResponder = (result) => {
-  //   const { destination, source, type } = result;
-
-  //   if (destination && type === 'task') {
-  //     if (destination && destination.droppableId === source.droppableId) {
-  //       setBoardList((prev) => {
-  //         //1.특정 index찾기
-  //         const targetBoardIndex = prev.findIndex(
-  //           (item) => item.boardId === destination.droppableId
-  //         );
-  //         ///2. 전체 state복사
-  //         const boardCopy = [...prev];
-  //         ///3. 특정 index의 값 가져오기
-  //         const targetBoard = boardCopy[targetBoardIndex];
-  //         //4. 특정 index의 값의 toDos copy하기
-  //         const newToDos = [...targetBoard.toDos];
-  //         const [targetToDo] = newToDos.splice(source.index, 1);
-  //         newToDos.splice(destination.index, 0, targetToDo);
-  //         boardCopy[targetBoardIndex] = {
-  //           ...targetBoard,
-  //           toDos: newToDos,
-  //         };
-  //         return boardCopy;
-  //       });
-  //     }
-  //   }
-  // };
-
+  const onToDoSubmit: SubmitHandler<IForm> = (value) => {
+    setBoardList((prev): any => {
+      const boardCopy = [...prev];
+      const targetBoardIndex = prev.findIndex(
+        (item) => item.boardId === props.boardId
+      );
+      const targetTaskCopy = boardCopy[targetBoardIndex];
+      const targetToDos = [...targetTaskCopy.toDos];
+      // boardCopy[targetBoardIndex] = {
+      //   ...targetTaskCopy, toDos:
+      // }
+    });
+    console.log(value, '<value');
+  };
   return (
     <>
       <Draggable draggableId={props.boardId} index={props.index}>
@@ -81,6 +70,10 @@ function TrelloBoards(props: IBoard) {
             {...provied.dragHandleProps}
           >
             <Title>{props.boardId}</Title>
+            <Form onSubmit={handleSubmit(onToDoSubmit)}>
+              <input {...register('toDo', { required: true })} type="text" />
+              <button>submit</button>
+            </Form>
             {/* <DragDropContext onDragEnd={onDragEnd}> */}
             <Droppable
               direction="vertical"
