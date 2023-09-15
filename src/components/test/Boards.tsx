@@ -23,6 +23,8 @@ const Area = styled.div`
   background-color: ${(props) => props.theme.boardColor};
   background-color: #e1cdff;
   border-radius: 5px;
+  height: min-content;
+
   padding: 10px;
   transition: background-color 0.3s ease-in-out;
 `;
@@ -54,11 +56,14 @@ function TrelloBoards(props: IBoard) {
       );
       const targetTaskCopy = boardCopy[targetBoardIndex];
       const targetToDos = [...targetTaskCopy.toDos];
-      // boardCopy[targetBoardIndex] = {
-      //   ...targetTaskCopy, toDos:
-      // }
+      const setToDos = [...targetToDos, value.toDo];
+      boardCopy[targetBoardIndex] = {
+        ...targetTaskCopy,
+        toDos: setToDos,
+      };
+      return boardCopy;
     });
-    console.log(value, '<value');
+    setValue('toDo', '');
   };
   return (
     <>
@@ -83,7 +88,12 @@ function TrelloBoards(props: IBoard) {
               {(provided: DroppableProvided) => (
                 <TaskList ref={provided.innerRef} {...provided.droppableProps}>
                   {props.toDos.map((item, idx) => (
-                    <Task item={item} index={idx} key={item} />
+                    <Task
+                      item={item}
+                      index={idx}
+                      key={idx + item}
+                      borderId={props.boardId}
+                    />
                   ))}
                   {provided.placeholder}
                 </TaskList>
