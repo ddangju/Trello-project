@@ -1,37 +1,30 @@
 import styled from 'styled-components';
-import { Draggable, Droppable, DroppableProvided } from 'react-beautiful-dnd';
-import DraggableCard from '../DraggableCard';
+import {
+  DragDropContext,
+  Draggable,
+  DropResult,
+  Droppable,
+  DroppableProvided,
+  OnDragEndResponder,
+} from 'react-beautiful-dnd';
 import { useForm } from 'react-hook-form';
-import { ITodo, toDoState } from '../../store/atoms';
-import { useSetRecoilState } from 'recoil';
-interface IAreaProps {
-  isDraggingFromThis: boolean;
-  isDraggingOver: boolean;
-}
+import { ITodo, boardState, toDoState } from '../../store/atoms';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { forwardRef } from 'react';
+import Task from './Task';
 
-interface IBoardProps {
-  boardId: string;
-  toDos: ITodo[];
-}
-const Boards = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: #dadfe9;
-  border-radius: 5px;
+const TaskList = styled.div`
+  background-color: #68faca;
 `;
 
 const Area = styled.div`
   width: 300px;
-  padding: 20px 10px;
-  padding-top: 10px;
-  background-color: ${(props) => props.theme.boardColor};
-  border-radius: 5px;
-  overflow: hidden;
   min-height: 300px;
-  flex-grow: 1;
+  background-color: ${(props) => props.theme.boardColor};
+  background-color: #e1cdff;
+  border-radius: 5px;
+  padding: 10px;
   transition: background-color 0.3s ease-in-out;
-  padding: 20px;
 `;
 const Title = styled.h2`
   text-align: center;
@@ -39,61 +32,78 @@ const Title = styled.h2`
   margin-bottom: 10px;
   font-size: 18px;
 `;
-const Form = styled.form`
-  width: 100%;
-  input {
-    width: 100%;
-  }
-`;
-interface IForm {
-  toDo: string;
-  boardId: number;
-  ref:(element: HTMLElement | null) => void;
+
+interface IBoard {
+  index: number;
+  boardId: string;
+  toDos: string[];
+  onDragEnd: OnDragEndResponder;
 }
-function TrelloBoards(props:IForm) {
-  const setToDos = useSetRecoilState(toDoState);
-  const { register, setValue, handleSubmit } = useForm<IForm>();
-  const onValid = ({ toDo }: IForm) => {
-  };
+
+function TrelloBoards(props: IBoard) {
+  const [boardList, setBoardList] = useRecoilState(boardState);
+
+  // const onDragEnd: OnDragEndResponder = (result) => {
+  //   const { destination, source, type } = result;
+
+  //   if (destination && type === 'task') {
+  //     if (destination && destination.droppableId === source.droppableId) {
+  //       setBoardList((prev) => {
+  //         //1.특정 index찾기
+  //         const targetBoardIndex = prev.findIndex(
+  //           (item) => item.boardId === destination.droppableId
+  //         );
+  //         ///2. 전체 state복사
+  //         const boardCopy = [...prev];
+  //         ///3. 특정 index의 값 가져오기
+  //         const targetBoard = boardCopy[targetBoardIndex];
+  //         //4. 특정 index의 값의 toDos copy하기
+  //         const newToDos = [...targetBoard.toDos];
+  //         const [targetToDo] = newToDos.splice(source.index, 1);
+  //         newToDos.splice(destination.index, 0, targetToDo);
+  //         boardCopy[targetBoardIndex] = {
+  //           ...targetBoard,
+  //           toDos: newToDos,
+  //         };
+  //         return boardCopy;
+  //       });
+  //     }
+  //   }
+  // };
+
   return (
     <>
-    <Draggable draggableId="1" index={props.boardId}>
-      {(provied)=>(
-        <Boards ref={provied.innerRef} {...provied.dragHandleProps} {...provied.dragHandleProps}>
-          <Title>title</Title>
-          <Form onSubmit={handleSubmit(onValid)}>
-            <input
-              {...register('toDo', { required: true })}
-              type="text"
-            />
-          </Form>
-        </Boards>
-      )}
-
+      <Draggable draggableId={props.boardId} index={props.index}>
+        {(provied) => (
+          <Area
+            ref={provied.innerRef}
+            {...provied.draggableProps}
+            {...provied.dragHandleProps}
+          >
+            <Title>{props.boardId}</Title>
+            {/* <DragDropContext onDragEnd={onDragEnd}> */}
+            <Droppable
+              direction="vertical"
+              droppableId={props.boardId}
+              type="task"
+            >
+              {(provided: DroppableProvided) => (
+                <TaskList ref={provided.innerRef} {...provided.droppableProps}>
+                  {props.toDos.map((item, idx) => (
+                    <Task item={item} index={idx} key={item} />
+                  ))}
+                  {provided.placeholder}
+                </TaskList>
+              )}
+            </Droppable>
+            {/* </DragDropContext> */}
+          </Area>
+        )}
       </Draggable>
     </>
   );
 }
 export default TrelloBoards;
-///isDraggingOver : board위로 드래그해서 들어고고 있는지 확인
-///draggingFromThisWith : 현재 droppable에서 벗어낫는지
-///isDragging
-// const Area = styled.div<IAreaProps>`
-//   width: 300px;
-//   padding: 20px 10px;
-//   padding-top: 10px;
-//   background-color: ${(props) => props.theme.boardColor};
-//   border-radius: 5px;
-//   overflow: hidden;
-//   min-height: 300px;
-//   background-color: ${(props) =>
-//     ///board위로 드래그를 해서 들어오고 있는찌? false면 해당 board로부터 드래깅을 시작했다면 해당 board는 red, 아니라면 blue
-//     props.isDraggingOver
-//       ? '#dfe6e9'
-//       : props.isDraggingFromThis
-//       ? '#b2bec3'
-//       : 'transparent'};
-//   flex-grow: 1;
-//   transition: background-color 0.3s ease-in-out;
-//   padding: 20px;
-// `;
+
+///react의 key
+//
