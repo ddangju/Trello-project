@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 import {
   DragDropContext,
   Draggable,
@@ -6,12 +6,13 @@ import {
   Droppable,
   DroppableProvided,
   OnDragEndResponder,
-} from 'react-beautiful-dnd';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { ITodo, boardState, toDoState } from '../../store/atoms';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { forwardRef } from 'react';
-import Task from './Task';
+} from "react-beautiful-dnd";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { ITodo, boardState, toDoSelector, toDoState } from "../../store/atoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { forwardRef } from "react";
+import Task from "./Task";
+import useSetBoard from "../../hooks/useSetBoard";
 
 const TaskList = styled.div`
   background-color: #68faca;
@@ -46,10 +47,12 @@ interface IForm {
 }
 function TrelloBoards(props: IBoard) {
   const [boardList, setBoardList] = useRecoilState(boardState);
+  const [toDos, setTodos] = useRecoilState(toDoSelector);
   const { register, setValue, handleSubmit } = useForm<IForm>();
-
   const onToDoSubmit: SubmitHandler<IForm> = (value) => {
-    setBoardList((prev): any => {
+    setTodos({ value, props });
+    // console.log(toDos, "<?");
+    setBoardList((prev) => {
       const boardCopy = [...prev];
       const targetBoardIndex = prev.findIndex(
         (item) => item.boardId === props.boardId
@@ -63,7 +66,7 @@ function TrelloBoards(props: IBoard) {
       };
       return boardCopy;
     });
-    setValue('toDo', '');
+    setValue("toDo", "");
   };
   return (
     <>
@@ -76,7 +79,7 @@ function TrelloBoards(props: IBoard) {
           >
             <Title>{props.boardId}</Title>
             <Form onSubmit={handleSubmit(onToDoSubmit)}>
-              <input {...register('toDo', { required: true })} type="text" />
+              <input {...register("toDo", { required: true })} type="text" />
               <button>submit</button>
             </Form>
             {/* <DragDropContext onDragEnd={onDragEnd}> */}

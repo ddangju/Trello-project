@@ -1,8 +1,9 @@
-import styled from 'styled-components';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { useForm } from 'react-hook-form';
-import { useSetRecoilState } from 'recoil';
-import { boardState } from '../../store/atoms';
+import styled from "styled-components";
+import { Draggable, Droppable } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
+import { boardState } from "../../store/atoms";
+import useSetBoard from "../../hooks/useSetBoard";
 
 interface IBoardProps {
   item: string;

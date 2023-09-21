@@ -4,11 +4,11 @@ import {
   DroppableProvided,
   DropResult,
   OnDragEndResponder,
-} from 'react-beautiful-dnd';
-import { useRecoilState } from 'recoil';
-import styled from 'styled-components';
-import { boardState, toDoState } from '../../store/atoms';
-import TrelloBoards from './Boards';
+} from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
+import styled from "styled-components";
+import { boardState, IBoardState, toDoState } from "../../store/atoms";
+import TrelloBoards from "./Boards";
 const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
@@ -22,10 +22,10 @@ const Boards = styled.div`
   gap: 20px;
 `;
 function MainPage() {
-  const [boardList, setBoardList] = useRecoilState(boardState);
+  const [boardList, setBoardList] = useRecoilState<IBoardState[]>(boardState);
   const onDragEnd: OnDragEndResponder = (result: DropResult) => {
     const { destination, source, type } = result;
-    if (destination && type === 'boards') {
+    if (destination && type === "boards") {
       setBoardList((args) => {
         //1.전체 배열 복사
         const boardCopy = [...args];
@@ -38,15 +38,15 @@ function MainPage() {
         return boardCopy;
       });
     }
-    if (destination && type === 'task') {
+    if (destination && type === "task") {
       if (destination && destination.droppableId === source.droppableId) {
         setBoardList((prev) => {
+          ///2. 전체 state복사
+          const boardCopy = [...prev];
           //1.특정 index찾기
           const targetBoardIndex = prev.findIndex(
             (item) => item.boardId === destination.droppableId
           );
-          ///2. 전체 state복사
-          const boardCopy = [...prev];
           ///3. 특정 index의 값 가져오기
           const targetBoard = boardCopy[targetBoardIndex];
           //4. 특정 index의 값의 toDos copy하기
