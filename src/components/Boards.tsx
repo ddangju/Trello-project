@@ -1,18 +1,14 @@
 import styled from "styled-components";
 import {
-  DragDropContext,
   Draggable,
-  DropResult,
   Droppable,
   DroppableProvided,
   OnDragEndResponder,
 } from "react-beautiful-dnd";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ITodo, boardState, toDoSelector, toDoState } from "../../store/atoms";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { forwardRef } from "react";
+import { IBoardState, boardState } from "../state/boards";
+import { useSetRecoilState } from "recoil";
 import Task from "./Task";
-import useSetBoard from "../../hooks/useSetBoard";
 
 const TaskList = styled.div`
   background-color: #68faca;
@@ -46,16 +42,13 @@ interface IForm {
   toDo: string;
 }
 function TrelloBoards(props: IBoard) {
-  const [boardList, setBoardList] = useRecoilState(boardState);
-  const [toDos, setTodos] = useRecoilState(toDoSelector);
+  const setBoardList = useSetRecoilState(boardState);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const onToDoSubmit: SubmitHandler<IForm> = (value) => {
-    setTodos({ value, props });
-    // console.log(toDos, "<?");
-    setBoardList((prev) => {
+    setBoardList((prev: any) => {
       const boardCopy = [...prev];
       const targetBoardIndex = prev.findIndex(
-        (item) => item.boardId === props.boardId
+        (item: IBoardState) => item.boardId === props.boardId
       );
       const targetTaskCopy = boardCopy[targetBoardIndex];
       const targetToDos = [...targetTaskCopy.toDos];
@@ -82,7 +75,6 @@ function TrelloBoards(props: IBoard) {
               <input {...register("toDo", { required: true })} type="text" />
               <button>submit</button>
             </Form>
-            {/* <DragDropContext onDragEnd={onDragEnd}> */}
             <Droppable
               direction="vertical"
               droppableId={props.boardId}
@@ -102,7 +94,6 @@ function TrelloBoards(props: IBoard) {
                 </TaskList>
               )}
             </Droppable>
-            {/* </DragDropContext> */}
           </Area>
         )}
       </Draggable>
@@ -110,6 +101,3 @@ function TrelloBoards(props: IBoard) {
   );
 }
 export default TrelloBoards;
-
-///react의 key
-//

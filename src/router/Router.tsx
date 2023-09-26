@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
-import MainPage from "../components/test/Main";
+import MainPage from "../pages/Main";
 // import DragDropPage from "../pages/DragDropPage";
 
 const router = createBrowserRouter([

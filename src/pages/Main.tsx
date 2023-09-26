@@ -7,8 +7,8 @@ import {
 } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import { boardState, IBoardState, toDoState } from "../../store/atoms";
-import TrelloBoards from "./Boards";
+import { boardState, IBoardState } from "../state/boards";
+import TrelloBoards from "../components/Boards";
 const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
