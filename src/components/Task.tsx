@@ -1,9 +1,7 @@
 import styled from "styled-components";
-import { Draggable, Droppable } from "react-beautiful-dnd";
-import { useForm } from "react-hook-form";
+import { Draggable } from "react-beautiful-dnd";
 import { useSetRecoilState } from "recoil";
-import { boardState } from "../../store/atoms";
-import useSetBoard from "../../hooks/useSetBoard";
+import { boardState } from "../state/boards";
 
 interface IBoardProps {
   item: string;
@@ -25,10 +23,10 @@ const Wrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-function Task(props: IBoardProps) {
+function Board(props: IBoardProps) {
   const setBoardList = useSetRecoilState(boardState);
-  const onDeleteToDo = (result: any) => {
-    setBoardList((prev): any => {
+  const onDeleteToDo = () => {
+    setBoardList((prev) => {
       const targetBoardIndex = prev.findIndex(
         (item) => item.boardId === props.borderId
       );
@@ -64,4 +62,4 @@ function Task(props: IBoardProps) {
   );
 }
 
-export default Task;
+export default Board;
